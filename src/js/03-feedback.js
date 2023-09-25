@@ -1,29 +1,56 @@
-// import { galleryItems } from './gallery-items';
-// // Описаний в документації
-// import SimpleLightbox from 'simplelightbox';
-// // Додатковий імпорт стилів
-// import 'simplelightbox/dist/simple-lightbox.min.css';
+import throttle from 'lodash.throttle';
 
-// const galleryContainerEl = document.querySelector('.gallery');
-// const imagesEl = createGalleryImg(galleryItems);
-// galleryContainerEl.insertAdjacentHTML('beforeend', imagesEl);
+const STORAGE_KEY = 'feedback-form-state';
+let formData = {};
 
-// function createGalleryImg(item) {
-//   return galleryItems
-//     .map(({ preview, original, description }) => {
-//       return `<ul class="gallery">
-//         <li>
-//  <a class="gallery__item" href="${original}">
-//   <img class="gallery__image" src="${preview}" alt="${description}" />
-// </a>
-// </li>
-// </ul>`;
-//     })
-//     .join('');
-// }
+const refs = {
+  form: document.querySelector('.feedback-form'),
+  textarea: document.querySelector('.feedback-form textarea'),
+  input: document.querySelector('.feedback-form input'),
+};
+console.log(refs.textarea.value);
 
-// const lightbox = new SimpleLightbox('.gallery a', {
-//   captionsData: 'alt',
-//   captionDelay: 250,
-//   captionType: 'alt',
+refs.form.addEventListener('submit', onFormSubmit);
+refs.form.addEventListener('input', throttle(onTextareaInput, 500));
+// refs.input.addEventListener('input', throttle(onTextareaInput, 500));
+
+populateTextarea();
+
+function onFormSubmit(e) {
+  e.preventDefault();
+
+  const { email, message } = e.currentTarget.elements;
+  console.log({ email: email.value.trim(), message: message.value.trim() });
+
+  e.currentTarget.reset();
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+function onTextareaInput() {
+  formData = {
+    email: refs.input.value.trim(),
+    message: refs.textarea.value.trim(),
+  };
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+  console.log(formData);
+}
+
+function populateTextarea(e) {
+  const savedMessage = localStorage.getItem(STORAGE_KEY);
+
+  if (!savedMessage) return;
+  formData = JSON.parse(savedMessage);
+  refs.input.value = formData.email ?? '';
+  refs.textarea.value = formData.message ?? '';
+}
+
+// refs.form.addEventListener('input', e => {
+//   console.log(e);
+//   console.log(e.target.name);
+//   console.log(e.target.value);
+
+//   formData[e.target.name] = e.target.value;
+
+//   console.log(formData);
 // });
