@@ -20,10 +20,17 @@ function onFormSubmit(e) {
   e.preventDefault();
 
   const { email, message } = e.currentTarget.elements;
+
+  if (email.value === '' || message.value === '') {
+    return alert('Заповніть всі поля!');
+  }
+
   console.log({ email: email.value.trim(), message: message.value.trim() });
 
-  e.currentTarget.reset();
   localStorage.removeItem(STORAGE_KEY);
+  e.currentTarget.reset();
+
+  formData = {};
 }
 
 function onTextareaInput() {
@@ -36,7 +43,7 @@ function onTextareaInput() {
   // console.log(formData);
 }
 
-function populateTextarea(e) {
+function populateTextarea() {
   const savedMessage = localStorage.getItem(STORAGE_KEY);
 
   if (!savedMessage) return;
